@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>User Form</title>
+  </head>
+  <body>
+    <form id="userForm">
+      <label for="username">Name</label>
+      <input type="text" id="username" name="username" required>
+      <label for="email">Email Id</label>
+      <input type="email" id="email" name="email" required>
+      <label for="phone">Phone Number</label>
+      <input type="tel" id="phone" name="phone" required>
+      <button type="submit">Submit</button>
+    </form>
+    <ul id="userList"></ul>
+
+    <script>
+      const userForm = document.getElementById('userForm');
+      const userList = document.getElementById('userList');
+
+      userForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const name = userForm.username.value;
+        const email = userForm.email.value;
+        const phone = userForm.phone.value;
+
+        const userData = {
+          name: name,
+          email: email,
+          phone: phone
+        };
+
+        // Check if user already exists
+        const existingUser = localStorage.getItem(email);
+        if (existingUser) {
+          // Update user data in localStorage
+          localStorage.setItem(email, JSON.stringify(userData));
+
+          // Update user data on screen
+          const existingUserElement = document.getElementById(email);
+          existingUserElement.firstChild.textContent = `${name} - ${email}`;
+        } else {
+          // Add new user data to localStorage
+          localStorage.setItem(email, JSON.stringify(userData));
+
+          // Add new user data to screen
+          const listItem = document.createElement('li');
+          listItem.setAttribute('id', email);
+          const text = document.createTextNode(`${name} - ${email}`);
+          const deleteButton = document.createElement('button');
+          deleteButton.textContent = 'Delete';
+          deleteButton.addEventListener('click', function() {
+            // Delete user data from localStorage and screen
+            localStorage.removeItem(email);
+            listItem.remove();
+          });
+          const editButton = document.createElement('button');
+          editButton.textContent = 'Edit';
+          editButton.addEventListener('click', function() {
+            // Load user data into form for editing
+            userForm.username.value = name;
+            userForm.email.value = email;
+            userForm.phone.value = phone;
+          });
+
+          listItem.appendChild(text);
+          listItem.appendChild(deleteButton);
+          listItem.appendChild(editButton);
+          userList.appendChild(listItem);
+        }
+
+        userForm.reset();
+      });
+    </script>
+  </body>
+</html>
